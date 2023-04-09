@@ -1,0 +1,42 @@
+version: '3'
+services:
+  shards1:
+    container_name: shards1
+    image: mongo
+    command: mongod --shardsvr --replSet shard1rs --port 27017 --dbpath /data/db
+    ports:
+      - 50001:27017
+    volumes:
+      - shards1:/data/db
+  shard1s2:
+    container_name: shard1s2
+    image: mongo
+    command: mongod --shardsvr --replSet shard1rs --port 27017 --dbpath /data/db
+    ports:
+      - 50002:27017
+    volumes:
+      - shard1s2:/data/db
+  shard1s3:
+    container_name: shard1s3
+    image: mongo
+    command: mongod --shardsvr --replSet shard1rs --port 27017 --dbpath /data/db
+    ports:
+      - 50003:27017
+    volumes:
+      - shard1s3:/data/db
+
+  shardclient:
+    container_name: shardclient
+    image: mongo
+    entrypoint: ["bash","./scripts/init_shared-replica.sh"]
+    volumes:
+      - ./scripts:/scripts
+    depends_on:
+      - shards1
+      - shard1s2
+      - shard1s3
+      
+volumes:
+  shards1: {}
+  shard1s2: {}
+  shard1s3: {}
